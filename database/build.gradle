@@ -1,0 +1,10 @@
+dependencies {
+    compile 'org.springframework:spring-jdbc:4.3.+'
+
+    testCompile 'org.flywaydb:flyway-core:4.0.+'
+    testCompile 'com.zaxxer:HikariCP:2.5.+'
+    testCompile 'com.ninja-squad:DbSetup:2.1.+'
+
+    testCompile 'com.h2database:h2:1.4.+'
+    testCompile 'org.postgresql:postgresql:9.4.+'
+}
