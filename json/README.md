@@ -43,12 +43,3 @@ println("score: ${news.score}") // score: 61
 println("kids: ${news.kids}") // kids: [487171, 15, 234509, 454410, 82729]
 println("title: ${news.title}") // title: Y Combinator
 ```
-
-## Links
-
-* https://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
-* https://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html
-* http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/namedparam/NamedParameterJdbcTemplate.html
-* http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/jdbc/core/JdbcTemplate.html
-* https://github.com/andrewoma/kwery
-* http://dbsetup.ninja-squad.com/user-guide.html

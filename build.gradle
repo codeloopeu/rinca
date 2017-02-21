@@ -1,6 +1,6 @@
 allprojects {
     group = 'com.softwareberg'
-    version = '0.3.0'
+    version = '0.3.2'
 }
 
 buildscript {
@@ -35,6 +35,15 @@ subprojects {
             xml.enabled true
         }
         dependsOn test
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
     }
 
     dependencies {
