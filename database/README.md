@@ -1,21 +1,19 @@
-# Database
+# Database - JDBC for Kotlin
 
-## JDBC for Kotlin
-
-### Install
+## Install
 
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg:database:-SNAPSHOT'
+    compile 'com.github.softwareberg.rinca:database:-SNAPSHOT'
 }
 ```
 
-### Examples
+## Examples
 
-#### Simple
+### Simple
 
 ```kotlin
 val db = Database(dataSource)
@@ -31,7 +29,7 @@ println("insertedId: $insertedId") // insertedId: 3
 println("rowsAffectedCount: $rowsAffectedCount") // rowsAffectedCount: 1
 ```
 
-#### Data class mapping
+### Data class mapping
 
 ```kotlin
 val db = Database(dataSource)
@@ -40,22 +38,7 @@ val person = db.findOne("SELECT id, name FROM people WHERE id = 1", personExtrac
 println("person: $person") // Person(id=1, name=Michal)
 ```
 
-### Building
-
-#### Build
-
-```bash
-gradle
-```
-
-#### Code coverage
-
-```bash
-gradle jacocoTestReport
-open build/reports/jacoco/test/html/index.html
-```
-
-#### Docker
+## Docker
 
 ```bash
 docker run --name softwareberg-postgres-db -p 5432:5432 -e POSTGRES_USER=softwareberg -e POSTGRES_PASSWORD=softwareberg -d postgres:9.6

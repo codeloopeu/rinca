@@ -1,19 +1,17 @@
-# HTTP Client
+# HTTP Client - HTTP Client for Kotlin
 
-## HTTP Client for Kotlin
-
-### Install
+## Install
 
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg:httpclient:-SNAPSHOT'
+    compile 'com.github.softwareberg.rinca:httpclient:-SNAPSHOT'
 }
 ```
 
-### Examples
+## Examples
 
 ```kotlin
 import com.softwareberg.HttpMethod.GET
@@ -24,21 +22,6 @@ val (statusCode, headers, body) = httpClient.execute(HttpRequest(GET, "http://ur
 println("statusCode: $statusCode")
 println("headers: $headers")
 println("body: $body")
-```
-
-### Building
-
-#### Build
-
-```bash
-gradle
-```
-
-#### Code coverage
-
-```bash
-gradle jacocoTestReport
-open build/reports/jacoco/test/html/index.html
 ```
 
 ### Links
