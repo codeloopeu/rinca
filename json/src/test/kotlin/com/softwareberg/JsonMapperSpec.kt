@@ -1,11 +1,13 @@
 package com.softwareberg
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class JsonMapperSpec {
 
     private data class HackerNews(val id: Int, val score: Int, val kids: List<Int> = emptyList(), val time: Int, val title: String, val text: String?, val url: String?, val type: String = "story")
+    private data class Foo(@JsonProperty(value = "baz") val bar: String)
 
     private val jsonMapper = JsonMapper.create()
 
@@ -92,24 +94,13 @@ class JsonMapperSpec {
     }
 
     @Test
-    fun `it should map json to domain class and ignore unknown fields`() {
+    fun `it should map json fields to domain class with different name mapping`() {
         // given
-        val exampleHackerNews = """
-{
-    "by": "pg",
-    "descendants": 15,
-    "id": 1,
-    "score": 61,
-    "time": 1160418111,
-    "title": "Y Combinator",
-    "url": "http://ycombinator.com",
-    "tmp": "tmp"
-}
-"""
+        val json = """{"baz": "foo"}"""
         // when
-        val news = jsonMapper.read<HackerNews>(exampleHackerNews)
+        val foo = jsonMapper.read<Foo>(json)
         // then
-        assertEquals("Y Combinator", news.title)
+        assertEquals("foo", foo.bar)
     }
 
     @Test
@@ -139,33 +130,5 @@ class JsonMapperSpec {
   "url" : "http://www.paulgraham.com/mit.html",
   "type" : "story"
 }""", json)
-    }
-
-    @Test
-    fun `dadfsdfit should map json to domain class`() {
-
-        val hackerNews = """
-{
-    "by": "pg",
-    "descendants": 15,
-    "id": 1,
-    "kids": [
-        487171,
-        15,
-        234509,
-        454410,
-        82729
-    ],
-    "score": 61,
-    "time": 1160418111,
-    "title": "Y Combinator",
-    "type": "story",
-    "url": "http://ycombinator.com"
-}
-"""
-        val news = jsonMapper.read<HackerNews>(hackerNews)
-        println("score: ${news.score}") // score: 61
-        println("kids: ${news.kids}") // kids: [487171, 15, 234509, 454410, 82729]
-        println("title: ${news.title}") // title: Y Combinator
     }
 }

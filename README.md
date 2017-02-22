@@ -13,7 +13,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:database:0.3.+'
+    compile 'com.github.softwareberg.rinca:database:0.4.+'
 }
 ```
 
@@ -35,7 +35,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:httpclient:0.3.+'
+    compile 'com.github.softwareberg.rinca:httpclient:0.4.+'
 }
 ```
 
@@ -61,7 +61,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:json:0.3.+'
+    compile 'com.github.softwareberg.rinca:json:0.4.+'
 }
 ```
 
@@ -96,6 +96,46 @@ val news = jsonMapper.read<HackerNews>(hackerNews)
 println("score: ${news.score}") // score: 61
 println("kids: ${news.kids}") // kids: [487171, 15, 234509, 454410, 82729]
 println("title: ${news.title}") // title: Y Combinator
+```
+
+## [XML](https://github.com/softwareberg/rinca/tree/master/xml)
+
+### Install
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+dependencies {
+    compile 'com.github.softwareberg.rinca:xml:0.4.+'
+}
+```
+
+### Sample
+
+```kotlin
+@JacksonXmlRootElement(localName = "foo")
+private class Foo {
+    var id: Int = 0
+    @JacksonXmlElementWrapper(useWrapping = false) @JsonProperty("bar") var bars: MutableList<Int> = mutableListOf()
+
+    @JsonSetter("bar")
+    fun addBar(bar: Int) {
+        this.bars.add(bar)
+    }
+}
+
+// given
+val fooA = Foo()
+fooA.id = 2
+fooA.bars = mutableListOf(2, 4, 5)
+// when
+val xml = xmlMapper.write(fooA)
+val fooB = xmlMapper.read<Foo>(xml)
+// then
+assertEquals("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>", xml)
+assertEquals(2, fooB.id)
+assertEquals(listOf(2, 4, 5), fooB.bars)
 ```
 
 ## Building

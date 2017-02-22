@@ -1,0 +1,10 @@
+dependencies {
+    ext.jacksonVersion = '2.8.6'
+
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+    compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+
+    compile "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:$jacksonVersion"
+    compile 'org.codehaus.woodstox:woodstox-core-asl:4.4.+'
+}
