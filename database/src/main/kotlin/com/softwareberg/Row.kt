@@ -8,29 +8,36 @@ import java.sql.*
 /*
 https://github.com/andrewoma/kwery/blob/master/core/src/main/kotlin/com/github/andrewoma/kwery/core/Row.kt
  */
-class Row(val resultSet: ResultSet) {
+class Row(private val resultSet: ResultSet) {
     fun obj(name: String): Any = requireNotNull(resultSet.getObject(name), name)
     fun objectOrNull(name: String): Any? = resultSet.getObject(name)
 
     fun boolean(name: String): Boolean = requireNotNull(resultSet.getBoolean(name), name)
+    fun booleanValue(name: String): Boolean = boolean(name)
     fun booleanOrNull(name: String): Boolean? = valueOrNull(resultSet.getBoolean(name))
 
     fun byte(name: String): Byte = requireNotNull(resultSet.getByte(name), name)
+    fun byteValue(name: String): Byte = byte(name)
     fun byteOrNull(name: String): Byte? = valueOrNull(resultSet.getByte(name))
 
     fun short(name: String): Short = requireNotNull(resultSet.getShort(name), name)
+    fun shortValue(name: String): Short = short(name)
     fun shortOrNull(name: String): Short? = valueOrNull(resultSet.getShort(name))
 
     fun int(name: String): Int = requireNotNull(resultSet.getInt(name), name)
+    fun intValue(name: String): Int = int(name)
     fun intOrNull(name: String): Int? = valueOrNull(resultSet.getInt(name))
 
     fun long(name: String): Long = requireNotNull(resultSet.getLong(name), name)
+    fun longValue(name: String): Long = long(name)
     fun longOrNull(name: String): Long? = valueOrNull(resultSet.getLong(name))
 
     fun float(name: String): Float = requireNotNull(resultSet.getFloat(name), name)
+    fun floatValue(name: String): Float = float(name)
     fun floatOrNull(name: String): Float? = valueOrNull(resultSet.getFloat(name))
 
     fun double(name: String): Double = requireNotNull(resultSet.getDouble(name), name)
+    fun doubleValue(name: String): Double = double(name)
     fun doubleOrNull(name: String): Double? = valueOrNull(resultSet.getDouble(name))
 
     fun bigDecimal(name: String): BigDecimal = resultSet.getBigDecimal(name)
