@@ -33,5 +33,5 @@ data class HttpHeader(val name: String, val value: String) {
     }
 }
 
-data class HttpRequest(val method: HttpMethod, val url: String, val headers: List<HttpHeader> = emptyList(), val body: String? = null)
-data class HttpResponse(val statusCode: Int, val headers: List<HttpHeader> = emptyList(), val body: String? = null)
+data class HttpRequest @JvmOverloads constructor(val method: HttpMethod, val url: String, val headers: List<HttpHeader> = emptyList(), val body: String? = null)
+data class HttpResponse @JvmOverloads constructor(val statusCode: Int, val headers: List<HttpHeader> = emptyList(), val body: String? = null)

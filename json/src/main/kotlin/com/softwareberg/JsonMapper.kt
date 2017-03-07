@@ -21,7 +21,11 @@ class JsonMapper(val objectMapper: ObjectMapper) {
     }
 
     inline fun <reified T> read(json: String): T {
-        return objectMapper.readValue(json, T::class.java)
+        return read(json, T::class.java)
+    }
+
+    fun <T> read(json: String, valueType: Class<T>): T {
+        return objectMapper.readValue(json, valueType)
     }
 
     fun write(obj: Any): String = objectMapper.writeValueAsString(obj)

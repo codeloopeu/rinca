@@ -21,8 +21,12 @@ class XmlMapper(val objectMapper: ObjectMapper) {
         }
     }
 
-    inline fun <reified T> read(json: String): T {
-        return objectMapper.readValue(json, T::class.java)
+    inline fun <reified T> read(xml: String): T {
+        return read(xml, T::class.java)
+    }
+
+    fun <T> read(xml: String, valueType: Class<T>): T {
+        return objectMapper.readValue(xml, valueType)
     }
 
     fun write(obj: Any): String = objectMapper.writeValueAsString(obj)
