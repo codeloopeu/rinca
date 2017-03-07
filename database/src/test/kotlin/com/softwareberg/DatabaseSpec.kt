@@ -49,8 +49,8 @@ class DatabaseSpec {
 
     private val deleteAll = deleteAllFrom("People")
     private val insertTwoPeople = insertInto("People").columns("id", "name").values(1, "Michal").values(2, "Kasia").build()
-    private val nameExtractor: Extractor<String> = { rs -> rs.getString("name") }
-    private val idExtractor: Extractor<Int> = { rs -> rs.getInt("id") }
+    private val nameExtractor: Extractor<String> = { rs -> rs.string("name") }
+    private val idExtractor: Extractor<Int> = { rs -> rs.int("id") }
 
     @Test
     fun `it should find people by id`() {
@@ -71,7 +71,7 @@ class DatabaseSpec {
         // given
         prepareDatabase(Operations.sequenceOf(deleteAll, insertTwoPeople))
         // when
-        val person = Database(dataSource).findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2), { rs -> Person(rs.getInt("id"), rs.getString("name")) })
+        val person = Database(dataSource).findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2), { rs -> Person(rs.int("id"), rs.string("name")) })
         // then
         assertEquals(Person(2, "Kasia"), person)
     }

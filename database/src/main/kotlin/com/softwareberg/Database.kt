@@ -7,10 +7,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import java.sql.Connection
 import java.sql.PreparedStatement
-import java.sql.ResultSet
 import javax.sql.DataSource
 
-typealias Extractor<T> = (ResultSet) -> T
+typealias Extractor<T> = (Row) -> T
 
 class SqlStatement(val sql: String, val params: Array<out Any>)
 
@@ -25,7 +24,7 @@ class Database(private val dataSource: DataSource) {
     fun <T> findOne(stmt: SqlStatement, extractor: Extractor<T>): T? {
         return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs ->
             if (rs.next()) {
-                extractor(rs)
+                extractor(Row(rs))
             } else {
                 null
             }
@@ -35,7 +34,7 @@ class Database(private val dataSource: DataSource) {
     fun <T> findOne(stmt: NamedSqlStatement, extractor: Extractor<T>): T? {
         return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs ->
             if (rs.next()) {
-                extractor(rs)
+                extractor(Row(rs))
             } else {
                 null
             }
@@ -43,11 +42,11 @@ class Database(private val dataSource: DataSource) {
     }
 
     fun <T> findAll(stmt: SqlStatement, extractor: Extractor<T>): List<T> {
-        return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(rs) })
+        return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(Row(rs)) })
     }
 
     fun <T> findAll(stmt: NamedSqlStatement, extractor: Extractor<T>): List<T> {
-        return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(rs) })
+        return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(Row(rs)) })
     }
 
     fun <T> findOne(sql: String, extractor: Extractor<T>): T? = findOne(sql.paramsList(), extractor)
