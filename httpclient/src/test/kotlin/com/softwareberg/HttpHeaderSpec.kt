@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Base64
 
 class HttpHeaderSpec {
 

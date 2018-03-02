@@ -1,8 +1,8 @@
 package com.softwareberg
 
+import com.google.common.truth.Truth.assertThat
 import com.softwareberg.HttpMethod.GET
 import com.softwareberg.HttpMethod.POST
-import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockserver.integration.ClientAndServer.startClientAndServer
@@ -23,8 +23,8 @@ class HttpClientSpec {
         // when
         val (statusCode, _, body) = httpClient.execute(HttpRequest(GET, "http://localhost:1080/get")).join()
         // then
-        assertEquals(200, statusCode)
-        assertEquals("OK", body)
+        assertThat(statusCode).isEqualTo(200)
+        assertThat(body).isEqualTo("OK")
     }
 
     @Test
@@ -35,9 +35,9 @@ class HttpClientSpec {
         // when
         val (statusCode, headers, body) = httpClient.execute(HttpRequest(GET, "http://localhost:1080/get", listOf(HttpHeader("Accept", "text/plain"), HttpHeader("Accept-Charset", "utf-8")))).join()
         // then
-        assertEquals(200, statusCode)
-        assertEquals(HttpHeader("Content-Type", "text/plain; utf-8"), headers.find { it.name == "Content-Type"})
-        assertEquals("OK", body)
+        assertThat(statusCode).isEqualTo(200)
+        assertThat(body).isEqualTo("OK")
+        assertThat(headers).contains(HttpHeader("Content-Type", "text/plain; utf-8"))
     }
 
     @Test
@@ -48,8 +48,8 @@ class HttpClientSpec {
         // when
         val (statusCode, _, body) = httpClient.execute(HttpRequest(POST, "http://localhost:1080/post", emptyList(), "request")).join()
         // then
-        assertEquals(201, statusCode)
-        assertEquals("created", body)
+        assertThat(statusCode).isEqualTo(201)
+        assertThat(body).isEqualTo("created")
     }
 
     @Before
@@ -57,4 +57,3 @@ class HttpClientSpec {
         mockServerClient.reset()
     }
 }
-

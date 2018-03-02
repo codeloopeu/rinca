@@ -1,7 +1,11 @@
 package com.softwareberg
 
 import io.netty.handler.codec.http.DefaultHttpHeaders
-import org.asynchttpclient.*
+import org.asynchttpclient.AsyncHttpClient
+import org.asynchttpclient.DefaultAsyncHttpClient
+import org.asynchttpclient.Request
+import org.asynchttpclient.RequestBuilder
+import org.asynchttpclient.Response
 import java.util.concurrent.CompletableFuture
 
 interface HttpClient {

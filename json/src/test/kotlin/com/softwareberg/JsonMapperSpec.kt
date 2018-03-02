@@ -1,7 +1,7 @@
 package com.softwareberg
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class JsonMapperSpec {
@@ -15,82 +15,82 @@ class JsonMapperSpec {
     fun `it should map json to map`() {
         // givne
         val exampleHackerNews = """
-{
-    "by": "pg",
-    "descendants": 15,
-    "id": 1,
-    "kids": [
-        487171,
-        15,
-        234509,
-        454410,
-        82729
-    ],
-    "score": 61,
-    "time": 1160418111,
-    "title": "Y Combinator",
-    "type": "story",
-    "url": "http://ycombinator.com"
-}
-"""
+        {
+            "by": "pg",
+            "descendants": 15,
+            "id": 1,
+            "kids": [
+                487171,
+                15,
+                234509,
+                454410,
+                82729
+            ],
+            "score": 61,
+            "time": 1160418111,
+            "title": "Y Combinator",
+            "type": "story",
+            "url": "http://ycombinator.com"
+        }
+        """
         // when
         val map = jsonMapper.read<Map<String, Any>>(exampleHackerNews)
         // then
-        assertEquals(61, map["score"])
-        assertEquals(listOf(487171, 15, 234509, 454410, 82729), map["kids"])
-        assertEquals("Y Combinator", map["title"])
+        assertThat(map["score"]).isEqualTo(61)
+        assertThat(map["kids"]).isEqualTo(listOf(487171, 15, 234509, 454410, 82729))
+        assertThat(map["title"]).isEqualTo("Y Combinator")
     }
 
     @Test
     fun `it should map json to domain class`() {
         val exampleHackerNews = """
-{
-    "by": "pg",
-    "descendants": 15,
-    "id": 1,
-    "kids": [
-        487171,
-        15,
-        234509,
-        454410,
-        82729
-    ],
-    "score": 61,
-    "time": 1160418111,
-    "title": "Y Combinator",
-    "type": "story",
-    "url": "http://ycombinator.com"
-}
-"""
+        {
+            "by": "pg",
+            "descendants": 15,
+            "id": 1,
+            "kids": [
+                487171,
+                15,
+                234509,
+                454410,
+                82729
+            ],
+            "score": 61,
+            "time": 1160418111,
+            "title": "Y Combinator",
+            "type": "story",
+            "url": "http://ycombinator.com"
+        }
+        """
         // when
         val news = jsonMapper.read<HackerNews>(exampleHackerNews)
         // then
-        assertEquals(61, news.score)
-        assertEquals(listOf(487171, 15, 234509, 454410, 82729), news.kids)
-        assertEquals("Y Combinator", news.title)
+        assertThat(news.score).isEqualTo(61)
+        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729).inOrder()
+        assertThat(news.title).isEqualTo("Y Combinator")
     }
 
     @Test
     fun `it should map json to domain class and set defaults`() {
         // given
         val exampleHackerNews = """
-{
-    "by": "pg",
-    "descendants": 15,
-    "id": 1,
-    "score": 61,
-    "time": 1160418111,
-    "title": "Y Combinator",
-    "url": "http://ycombinator.com"
-}
-"""
+        {
+            "by": "pg",
+            "descendants": 15,
+            "id": 1,
+            "score": 61,
+            "time": 1160418111,
+            "title": "Y Combinator",
+            "url": "http://ycombinator.com"
+        }
+        """
         // when
         val news = jsonMapper.read<HackerNews>(exampleHackerNews)
         // then
-        assertEquals(61, news.score)
-        assertEquals(emptyList<Int>(), news.kids)
-        assertEquals("Y Combinator", news.title)
-        assertEquals("story", news.type)
+        assertThat(news.score).isEqualTo(61)
+        assertThat(news.kids).isEmpty()
+        assertThat(news.title).isEqualTo("Y Combinator")
+        assertThat(news.type).isEqualTo("story")
     }
 
     @Test
@@ -100,7 +100,7 @@ class JsonMapperSpec {
         // when
         val foo = jsonMapper.read<Foo>(json)
         // then
-        assertEquals("foo", foo.bar)
+        assertThat(foo.bar).isEqualTo("foo")
     }
 
     @Test
@@ -110,7 +110,7 @@ class JsonMapperSpec {
         // when
         val json = jsonMapper.write(hackerNews)
         // then
-        assertEquals("""{"id":2,"score":16,"kids":[454411],"time":1160418628,"title":"A Student's Guide to Startups","text":null,"url":"http://www.paulgraham.com/mit.html","type":"story"}""", json)
+        assertThat(json).isEqualTo("""{"id":2,"score":16,"kids":[454411],"time":1160418628,"title":"A Student's Guide to Startups","text":null,"url":"http://www.paulgraham.com/mit.html","type":"story"}""")
     }
 
     @Test
@@ -120,7 +120,8 @@ class JsonMapperSpec {
         // when
         val json = jsonMapper.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(hackerNews)
         // then
-        assertEquals("""{
+        assertThat(json).isEqualTo(
+"""{
   "id" : 2,
   "score" : 16,
   "kids" : [ 454411 ],
@@ -129,6 +130,6 @@ class JsonMapperSpec {
   "text" : null,
   "url" : "http://www.paulgraham.com/mit.html",
   "type" : "story"
-}""", json)
+}""")
     }
 }

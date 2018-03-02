@@ -3,7 +3,12 @@ package com.softwareberg
 import java.io.InputStream
 import java.io.Reader
 import java.math.BigDecimal
-import java.sql.*
+import java.sql.Blob
+import java.sql.Clob
+import java.sql.Date
+import java.sql.ResultSet
+import java.sql.Time
+import java.sql.Timestamp
 
 /*
 https://github.com/andrewoma/kwery/blob/master/core/src/main/kotlin/com/github/andrewoma/kwery/core/Row.kt

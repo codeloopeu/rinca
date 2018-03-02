@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import javax.xml.bind.annotation.XmlAttribute
@@ -40,47 +41,48 @@ class XmlMapperSpec {
     fun `it should map xml to map`() {
         // givne
         val exampleHackerNews = """
-<news id="1" score="61" timestamp="1160418111" type="story" by="pg">
-  <kids>
-    <kid>487171</kid>
-    <kid>15</kid>
-    <kid>234509</kid>
-    <kid>454410</kid>
-    <kid>82729</kid>
-  </kids>
-  <title>Y Combinator</title>
-  <url>http://ycombinator.com</url>
-</news>
-"""
+        <news id="1" score="61" timestamp="1160418111" type="story" by="pg">
+          <kids>
+            <kid>487171</kid>
+            <kid>15</kid>
+            <kid>234509</kid>
+            <kid>454410</kid>
+            <kid>82729</kid>
+          </kids>
+          <title>Y Combinator</title>
+          <url>http://ycombinator.com</url>
+        </news>
+        """
         // when
         val map = xmlMapper.read<Map<String, Any>>(exampleHackerNews)
         // then
-        assertEquals("61", map["score"])
-        assertEquals("{kid=82729}", map["kids"].toString())
-        assertEquals("Y Combinator", map["title"])
+        assertThat(map["score"]).isEqualTo("61")
+        assertThat(map["kids"]).isEqualTo(mapOf("kid" to "82729"))
+        assertThat(map["title"]).isEqualTo("Y Combinator")
     }
 
     @Test
     fun `it should map xml to domain class`() {
         val exampleHackerNews = """
-<news id="1" score="61" timestamp="1160418111" type="story" by="pg">
-  <kids>
-    <kid>487171</kid>
-    <kid>15</kid>
-    <kid>234509</kid>
-    <kid>454410</kid>
-    <kid>82729</kid>
-  </kids>
-  <title>Y Combinator</title>
-  <url>http://ycombinator.com</url>
-</news>
-"""        // when
+        <news id="1" score="61" timestamp="1160418111" type="story" by="pg">
+          <kids>
+            <kid>487171</kid>
+            <kid>15</kid>
+            <kid>234509</kid>
+            <kid>454410</kid>
+            <kid>82729</kid>
+          </kids>
+          <title>Y Combinator</title>
+          <url>http://ycombinator.com</url>
+        </news>
+        """
+        // when
         val news = xmlMapper.read<HackerNews>(exampleHackerNews)
         // then
-        assertEquals(61, news.score)
-        assertEquals(listOf(487171, 15, 234509, 454410, 82729), news.kids)
-        assertEquals("Y Combinator", news.title)
-        assertEquals(null, news.text)
+        assertThat(news.score).isEqualTo(61)
+        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729).inOrder()
+        assertThat(news.title).isEqualTo("Y Combinator")
+        assertThat(news.text).isNull()
     }
 
     @Test
@@ -93,9 +95,9 @@ class XmlMapperSpec {
         val xml = xmlMapper.write(fooA)
         val fooB = xmlMapper.read<Foo>(xml)
         // then
-        assertEquals("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>", xml)
-        assertEquals(2, fooB.id)
-        assertEquals(listOf(2, 4, 5), fooB.bars)
+        assertThat(xml).isEqualTo("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>")
+        assertThat(fooB.id).isEqualTo(2)
+        assertThat(fooB.bars).containsExactly(2, 4, 5).inOrder()
     }
 
     @Test
@@ -122,7 +124,7 @@ class XmlMapperSpec {
         // when
         val xml = xmlMapper.write(hackerNews)
         // then
-        assertEquals("""<news id="2" score="16" type="story" timestamp="1160418628"><title>A Student's Guide to Startups</title><text/><url>http://www.paulgraham.com/mit.html</url><kids><kid>454411</kid><kid>44423</kid></kids></news>""", xml)
+        assertThat(xml).isEqualTo("""<news id="2" score="16" type="story" timestamp="1160418628"><title>A Student's Guide to Startups</title><text/><url>http://www.paulgraham.com/mit.html</url><kids><kid>454411</kid><kid>44423</kid></kids></news>""")
     }
 
     @Test
@@ -138,7 +140,8 @@ class XmlMapperSpec {
         // when
         val xml = xmlMapper.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(hackerNews)
         // then
-        assertEquals("""<news id="2" score="16" type="story" timestamp="1160418628">
+        assertThat(xml).isEqualTo(
+"""<news id="2" score="16" type="story" timestamp="1160418628">
   <title>A Student's Guide to Startups</title>
   <text/>
   <url>http://www.paulgraham.com/mit.html</url>
@@ -147,8 +150,6 @@ class XmlMapperSpec {
     <kid>44423</kid>
   </kids>
 </news>
-""", xml)
+""")
     }
-
-
 }

@@ -1,5 +1,6 @@
 package com.softwareberg
 
+import com.google.common.truth.Truth.assertThat
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations
 import com.ninja_squad.dbsetup.Operations.deleteAllFrom
@@ -11,8 +12,6 @@ import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
 import org.h2.tools.Server
 import org.junit.AfterClass
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.BeforeClass
 import org.junit.Test
 
@@ -61,9 +60,9 @@ class DatabaseSpec {
         val nameB = Database(dataSource).findOne("SELECT name FROM people WHERE id = ?".paramsList(1), nameExtractor)
         val nameC = Database(dataSource).findOne("SELECT name FROM people WHERE id = :id".params("id" to 2), nameExtractor)
         // then
-        assertEquals("Michal", nameA)
-        assertEquals("Michal", nameB)
-        assertEquals("Kasia", nameC)
+        assertThat(nameA).isEqualTo("Michal")
+        assertThat(nameB).isEqualTo("Michal")
+        assertThat(nameC).isEqualTo("Kasia")
     }
 
     @Test
@@ -73,7 +72,7 @@ class DatabaseSpec {
         // when
         val person = Database(dataSource).findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2), { rs -> Person(rs.int("id"), rs.string("name")) })
         // then
-        assertEquals(Person(2, "Kasia"), person)
+        assertThat(person).isEqualTo(Person(2, "Kasia"))
     }
 
     @Test
@@ -85,9 +84,9 @@ class DatabaseSpec {
         val nonExsistingNameB = Database(dataSource).findOne("SELECT name FROM people WHERE id = ?".paramsList(3), nameExtractor)
         val nonExsistingNameC = Database(dataSource).findOne("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
         // then
-        assertNull(nonExsistingNameA)
-        assertNull(nonExsistingNameB)
-        assertNull(nonExsistingNameC)
+        assertThat(nonExsistingNameA).isNull()
+        assertThat(nonExsistingNameB).isNull()
+        assertThat(nonExsistingNameC).isNull()
     }
 
     @Test
@@ -97,7 +96,7 @@ class DatabaseSpec {
         // when
         val people = Database(dataSource).findAll("SELECT name FROM people", nameExtractor)
         // then
-        assertEquals(listOf("Michal", "Kasia"), people)
+        assertThat(people).containsExactly("Michal", "Kasia").inOrder()
     }
 
     @Test
@@ -109,9 +108,9 @@ class DatabaseSpec {
         val idsB = Database(dataSource).findAll("SELECT id FROM people WHERE name = ?".paramsList("Michal"), idExtractor)
         val idsC = Database(dataSource).findAll("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), idExtractor)
         // then
-        assertEquals(listOf(1, 4, 7), idsA)
-        assertEquals(listOf(1, 4, 7), idsB)
-        assertEquals(listOf(1, 4, 7), idsC)
+        assertThat(idsA).containsExactly(1, 4, 7).inOrder()
+        assertThat(idsB).containsExactly(1, 4, 7).inOrder()
+        assertThat(idsC).containsExactly(1, 4, 7).inOrder()
     }
 
     @Test
@@ -121,7 +120,7 @@ class DatabaseSpec {
         // when
         val ids = Database(dataSource).findAll("SELECT id FROM people WHERE name = :name".params("name" to "Ola"), idExtractor)
         // then
-        assertEquals(emptyList<Int>(), ids)
+        assertThat(ids).isEmpty()
     }
 
     @Test
@@ -134,7 +133,7 @@ class DatabaseSpec {
         Database(dataSource).insert("INSERT INTO people (id, name) VALUES (8, 'Michal')")
         val ids = Database(dataSource).findAll("SELECT id FROM people WHERE name = ?".paramsList("Michal"), idExtractor)
         // then
-        assertEquals(listOf(1, 3, 7, 8), ids)
+        assertThat(ids).containsExactly(1, 3, 7, 8).inOrder()
     }
 
     @Test
@@ -147,7 +146,7 @@ class DatabaseSpec {
         Database(dataSource).update("UPDATE people SET name = 'Zofia' WHERE id = :id".params("id" to 3))
         val people = Database(dataSource).findAll("SELECT name FROM people ORDER BY id", nameExtractor)
         // then
-        assertEquals(listOf("Szymon", "Piotr", "Zofia", "Michal", "Michal"), people)
+        assertThat(people).containsExactly("Szymon", "Piotr", "Zofia", "Michal", "Michal").inOrder()
     }
 
     private fun prepareDatabase(operation: Operation) {

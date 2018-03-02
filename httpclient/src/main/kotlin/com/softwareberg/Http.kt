@@ -1,7 +1,7 @@
 package com.softwareberg
 
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.Base64
 
 enum class HttpMethod {
     GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
