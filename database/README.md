@@ -47,19 +47,26 @@ To start transaction you could use `database.transaction`. For example:
 ```kotlin
 val db = Database(dataSource)
 db.transaction {
-    insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
-                insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 2, "name" to "Michal"))
+    db.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
+    db.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 2, "name" to "Michal"))
 }
 ```
 
-If all operation succeeded, then transaction is committed, otherwise rollback is executed.
+If all operation succeeded, then transaction is committed, otherwise it rolls the transaction back.
 
-Please note that during one transaction we must use the same connection. This is why, in the previous example, you should use `insert`, instead of `db.insert`. Under the hood, `transaction` block create new `com.softwareberg.Database` with `DataSource` that has only one connection. The connection is shared between operation and it has `autoCommit` set to false.
+Under the hood it uses `TransactionTemplate` ([more info](https://docs.spring.io/spring/docs/current/spring-framework-reference/data-access.html#tx-prog-template)).
 
 ## Docker
 
 ```bash
-docker run --name softwareberg-postgres-db -p 5432:5432 -e POSTGRES_USER=softwareberg -e POSTGRES_PASSWORD=softwareberg -d postgres:9.6
+docker run --name softwareberg-postgres-db -p 5432:5432 -e POSTGRES_USER=softwareberg -e POSTGRES_PASSWORD=softwareberg -d postgres:10.1-alpine
+```
+
+or
+
+```bash
+cd ./database/docker
+docker-compose up
 ```
 
 ## Links

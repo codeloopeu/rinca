@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
-import org.springframework.jdbc.datasource.SingleConnectionDataSource
 import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.Connection
@@ -46,6 +45,8 @@ class Database(private val dataSource: DataSource) {
         })
     }
 
+    fun <T> findOne(sql: String, extractor: Extractor<T>): T? = findOne(sql.paramsList(), extractor)
+
     fun <T> findAll(stmt: SqlStatement, extractor: Extractor<T>): List<T> {
         return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(Row(rs)) })
     }
@@ -53,8 +54,6 @@ class Database(private val dataSource: DataSource) {
     fun <T> findAll(stmt: NamedSqlStatement, extractor: Extractor<T>): List<T> {
         return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, { rs, _ -> extractor(Row(rs)) })
     }
-
-    fun <T> findOne(sql: String, extractor: Extractor<T>): T? = findOne(sql.paramsList(), extractor)
 
     fun <T> findAll(sql: String, extractor: Extractor<T>): List<T> = findAll(sql.paramsList(), extractor)
 
@@ -85,21 +84,6 @@ class Database(private val dataSource: DataSource) {
 
     fun insert(sql: String): Map<String, Any?> {
         return insert(sql.paramsList())
-    }
-
-    fun transactionWithSingleConnectionDataSource(operations: Database.() -> Unit) {
-        val connection = dataSource.connection
-        val singleConnectionDataSource = SingleConnectionDataSource(connection, false)
-        val database = Database(singleConnectionDataSource)
-        try {
-            connection.autoCommit = false
-            operations(database)
-            connection.commit()
-        } catch (e: Exception) {
-            connection.rollback()
-        } finally {
-            connection.autoCommit = true
-        }
     }
 
     fun transaction(operations: () -> Unit) {

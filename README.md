@@ -13,7 +13,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:database:0.7.0'
+    compile 'com.github.softwareberg.rinca:database:0.7.1'
 }
 ```
 
@@ -35,7 +35,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:httpclient:0.7.0'
+    compile 'com.github.softwareberg.rinca:httpclient:0.7.1'
 }
 ```
 
@@ -61,7 +61,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:json:0.7.0'
+    compile 'com.github.softwareberg.rinca:json:0.7.1'
 }
 ```
 
@@ -107,7 +107,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:xml:0.7.0'
+    compile 'com.github.softwareberg.rinca:xml:0.7.1'
 }
 ```
 
