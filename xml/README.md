@@ -33,7 +33,7 @@ fooA.bars = mutableListOf(2, 4, 5)
 val xml = xmlMapper.write(fooA)
 val fooB = xmlMapper.read<Foo>(xml)
 // then
-assertEquals("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>", xml)
-assertEquals(2, fooB.id)
-assertEquals(listOf(2, 4, 5), fooB.bars)
+assertThat(xml).isEqualTo("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>")
+assertThat(fooB.id).isEqualTo(2)
+assertThat(fooB.bars).containsExactly(2, 4, 5).inOrder()
 ```

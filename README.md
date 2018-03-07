@@ -21,9 +21,8 @@ dependencies {
 
 ```kotlin
 val db = Database(dataSource)
-val personExtractor: Extractor<Person> = { rs -> Person(rs.getInt("id"), rs.getString("name")) }
-val person = db.findOne("SELECT id, name FROM people WHERE id = 1", personExtractor)
-println("person: $person") // Person(id=1, name=Michal)
+val personName = db.findOne("SELECT id, name FROM people WHERE id = 1", { rs -> rs.string("name") })
+println("person name: personName")
 ```
 
 ## [HTTP Client](https://github.com/softwareberg/rinca/tree/master/httpclient)
@@ -42,9 +41,6 @@ dependencies {
 ### Sample
 
 ```kotlin
-import com.softwareberg.HttpMethod.GET
-import com.softwareberg.*
-
 val httpClient = SimpleHttpClient.create()
 val (statusCode, headers, body) = httpClient.execute(HttpRequest(GET, "http://urlecho.appspot.com/echo?body=HelloWorld")).join()
 println("statusCode: $statusCode")
@@ -133,9 +129,9 @@ fooA.bars = mutableListOf(2, 4, 5)
 val xml = xmlMapper.write(fooA)
 val fooB = xmlMapper.read<Foo>(xml)
 // then
-assertEquals("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>", xml)
-assertEquals(2, fooB.id)
-assertEquals(listOf(2, 4, 5), fooB.bars)
+assertThat(xml).isEqualTo("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>")
+assertThat(fooB.id).isEqualTo(2)
+assertThat(fooB.bars).containsExactly(2, 4, 5).inOrder()
 ```
 
 ## Building
