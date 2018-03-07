@@ -18,8 +18,8 @@ dependencies {
 ```kotlin
 val db = Database(dataSource)
 
-val id = db.findOne("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), { rs -> rs.getInt("id") })
-val names = db.findAll("SELECT name FROM people", { rs -> rs.getString("name") })
+val id = db.findOne("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), { rs -> rs.int("id") })
+val names = db.findAll("SELECT name FROM people", { rs -> rs.string("name") })
 val insertedId = db.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 3, "name" to "Michal"))["id"]
 val rowsAffectedCount = db.update("UPDATE people SET name = 'Piotr' WHERE id = ?".paramsList(2))
 
@@ -32,11 +32,29 @@ println("rowsAffectedCount: $rowsAffectedCount") // rowsAffectedCount: 1
 ### Data class mapping
 
 ```kotlin
+data class Person(val id: Int, val name: String)
+val personExtractor = createExtractor { rs -> Person(id = rs.int("id"), name = rs.string("name")) }
+
 val db = Database(dataSource)
-val personExtractor: Extractor<Person> = { rs -> Person(rs.getInt("id"), rs.getString("name")) }
 val person = db.findOne("SELECT id, name FROM people WHERE id = 1", personExtractor)
 println("person: $person") // Person(id=1, name=Michal)
 ```
+
+### Transactions
+
+To start transaction you could use `database.transaction`. For example:
+
+```kotlin
+val db = Database(dataSource)
+db.transaction {
+    insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
+                insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 2, "name" to "Michal"))
+}
+```
+
+If all operation succeeded, then transaction is committed, otherwise rollback is executed.
+
+Please note that during one transaction we must use the same connection. This is why, in the previous example, you should use `insert`, instead of `db.insert`. Under the hood, `transaction` block create new `com.softwareberg.Database` with `DataSource` that has only one connection. The connection is shared between operation and it has `autoCommit` set to false.
 
 ## Docker
 

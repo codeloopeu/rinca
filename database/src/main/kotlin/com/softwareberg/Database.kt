@@ -4,12 +4,17 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.ResultSetExtractor
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
+import org.springframework.jdbc.datasource.SingleConnectionDataSource
 import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.transaction.support.TransactionTemplate
 import java.sql.Connection
 import java.sql.PreparedStatement
 import javax.sql.DataSource
 
 typealias Extractor<T> = (Row) -> T
+
+fun <T> createExtractor(extractor: Extractor<T>): Extractor<T> = extractor
 
 class SqlStatement(val sql: String, val params: Array<out Any>)
 
@@ -80,6 +85,33 @@ class Database(private val dataSource: DataSource) {
 
     fun insert(sql: String): Map<String, Any?> {
         return insert(sql.paramsList())
+    }
+
+    fun transactionWithSingleConnectionDataSource(operations: Database.() -> Unit) {
+        val connection = dataSource.connection
+        val singleConnectionDataSource = SingleConnectionDataSource(connection, false)
+        val database = Database(singleConnectionDataSource)
+        try {
+            connection.autoCommit = false
+            operations(database)
+            connection.commit()
+        } catch (e: Exception) {
+            connection.rollback()
+        } finally {
+            connection.autoCommit = true
+        }
+    }
+
+    fun transaction(operations: () -> Unit) {
+        val transactionManager = DataSourceTransactionManager(dataSource)
+        val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.execute { status ->
+            try {
+                operations()
+            } catch (e: Exception) {
+                status.setRollbackOnly()
+            }
+        }
     }
 
     private fun prepareStatement(c: Connection, stmt: SqlStatement): PreparedStatement {
