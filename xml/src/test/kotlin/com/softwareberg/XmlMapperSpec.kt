@@ -5,9 +5,8 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
-import com.google.common.truth.Truth.assertThat
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 import javax.xml.bind.annotation.XmlAttribute
 
 class XmlMapperSpec {
@@ -80,7 +79,7 @@ class XmlMapperSpec {
         val news = xmlMapper.read<HackerNews>(exampleHackerNews)
         // then
         assertThat(news.score).isEqualTo(61)
-        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729).inOrder()
+        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729)
         assertThat(news.title).isEqualTo("Y Combinator")
         assertThat(news.text).isNull()
     }
@@ -97,7 +96,7 @@ class XmlMapperSpec {
         // then
         assertThat(xml).isEqualTo("<foo><id>2</id><bar>2</bar><bar>4</bar><bar>5</bar></foo>")
         assertThat(fooB.id).isEqualTo(2)
-        assertThat(fooB.bars).containsExactly(2, 4, 5).inOrder()
+        assertThat(fooB.bars).containsExactly(2, 4, 5)
     }
 
     @Test
@@ -107,8 +106,8 @@ class XmlMapperSpec {
         // when
         val foo = xmlMapper.read<Foo>(xml)
         // then
-        assertEquals(2, foo.id)
-        assertEquals(listOf(2, 4, 5), foo.bars)
+        assertThat(foo.id).isEqualTo(2)
+        assertThat(foo.bars).containsExactly(2, 4, 5)
     }
 
     @Test

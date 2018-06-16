@@ -1,10 +1,10 @@
 package com.softwareberg
 
-import com.google.common.truth.Truth.assertThat
 import com.softwareberg.HttpMethod.GET
 import com.softwareberg.HttpMethod.POST
-import org.junit.Before
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockserver.integration.ClientAndServer.startClientAndServer
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
@@ -52,7 +52,7 @@ class HttpClientSpec {
         assertThat(body).isEqualTo("created")
     }
 
-    @Before
+    @BeforeEach
     fun resetBeforeTest() {
         mockServerClient.reset()
     }

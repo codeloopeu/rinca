@@ -1,8 +1,8 @@
 package com.softwareberg
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Test
 
 class JsonMapperSpec {
 
@@ -66,7 +66,7 @@ class JsonMapperSpec {
         val news = jsonMapper.read<HackerNews>(exampleHackerNews)
         // then
         assertThat(news.score).isEqualTo(61)
-        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729).inOrder()
+        assertThat(news.kids).containsExactly(487171, 15, 234509, 454410, 82729)
         assertThat(news.title).isEqualTo("Y Combinator")
     }
 

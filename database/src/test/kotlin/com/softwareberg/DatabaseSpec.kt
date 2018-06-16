@@ -1,6 +1,5 @@
 package com.softwareberg
 
-import com.google.common.truth.Truth.assertThat
 import com.ninja_squad.dbsetup.DbSetup
 import com.ninja_squad.dbsetup.Operations
 import com.ninja_squad.dbsetup.Operations.deleteAllFrom
@@ -9,11 +8,12 @@ import com.ninja_squad.dbsetup.destination.DataSourceDestination
 import com.ninja_squad.dbsetup.operation.Operation
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import org.assertj.core.api.Assertions.assertThat
 import org.flywaydb.core.Flyway
 import org.h2.tools.Server
-import org.junit.AfterClass
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 
 class DatabaseSpec {
 
@@ -25,7 +25,7 @@ class DatabaseSpec {
         private val dataSource = createLocalDataSource()
         private val database = Database(dataSource)
 
-        @BeforeClass
+        @BeforeAll
         @JvmStatic
         fun `it should init database`() {
             val flyway = Flyway()
@@ -34,7 +34,7 @@ class DatabaseSpec {
             flyway.migrate()
         }
 
-        @AfterClass
+        @AfterAll
         @JvmStatic
         fun `it should close database`() {
             dataSource.close()
@@ -123,7 +123,7 @@ class DatabaseSpec {
         // when
         val people = database.findAll("SELECT name FROM people", nameExtractor)
         // then
-        assertThat(people).containsExactly("Michal", "Kasia").inOrder()
+        assertThat(people).containsExactly("Michal", "Kasia")
     }
 
     @Test
@@ -139,9 +139,9 @@ class DatabaseSpec {
         val idsB = database.findAll("SELECT id FROM people WHERE name = ?".paramsList("Michal"), idExtractor)
         val idsC = database.findAll("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), idExtractor)
         // then
-        assertThat(idsA).containsExactly(1, 4, 7).inOrder()
-        assertThat(idsB).containsExactly(1, 4, 7).inOrder()
-        assertThat(idsC).containsExactly(1, 4, 7).inOrder()
+        assertThat(idsA).containsExactly(1, 4, 7)
+        assertThat(idsB).containsExactly(1, 4, 7)
+        assertThat(idsC).containsExactly(1, 4, 7)
     }
 
     @Test
@@ -171,7 +171,7 @@ class DatabaseSpec {
         database.insert("INSERT INTO people (id, name) VALUES (8, 'Michal')")
         val ids = database.findAll("SELECT id FROM people WHERE name = ?".paramsList("Michal"), idExtractor)
         // then
-        assertThat(ids).containsExactly(1, 3, 7, 8).inOrder()
+        assertThat(ids).containsExactly(1, 3, 7, 8)
     }
 
     @Test
@@ -188,7 +188,7 @@ class DatabaseSpec {
         database.update("UPDATE people SET name = 'Zofia' WHERE id = :id".params("id" to 3))
         val people = findNamesOrderedById()
         // then
-        assertThat(people).containsExactly("Szymon", "Piotr", "Zofia", "Michal", "Michal").inOrder()
+        assertThat(people).containsExactly("Szymon", "Piotr", "Zofia", "Michal", "Michal")
     }
 
     @Test
@@ -204,7 +204,7 @@ class DatabaseSpec {
         }
         val people = findNamesOrderedById()
         // then
-        assertThat(people).containsExactly("Kasia", "Michal").inOrder()
+        assertThat(people).containsExactly("Kasia", "Michal")
     }
 
     @Test

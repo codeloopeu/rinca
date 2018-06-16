@@ -1,12 +1,12 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.2.30'
+    id 'org.jetbrains.kotlin.jvm' version '1.2.50'
     id 'com.github.ben-manes.versions' version '0.17.0'
     id 'org.jmailen.kotlinter' version '1.8.3'
 }
 
 allprojects {
     group = 'com.softwareberg.rinca'
-    version = '0.7.1'
+    version = '0.7.2'
 }
 
 defaultTasks 'build'
@@ -48,6 +48,10 @@ subprojects {
         archives sourcesJar
     }
 
+    test {
+        useJUnitPlatform()
+    }
+
     check {
         dependsOn = check.dependsOn + [ktLint]
     }
@@ -58,15 +62,15 @@ subprojects {
     }
 
     dependencies {
-        compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.30'
-        compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.30'
+        compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.50'
+        compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.50'
 
-        testCompile 'junit:junit:4.12'
+        testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
         testCompile 'com.nhaarman:mockito-kotlin:1.5.0'
-        testCompile 'com.google.truth:truth:0.39'
+        testCompile 'org.assertj:assertj-core:3.10.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.8'
 }
