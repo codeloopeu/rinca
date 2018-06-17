@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.sql.Statement
 import javax.sql.DataSource
 
 typealias Extractor<T> = (Row) -> T
@@ -116,6 +117,6 @@ class Database(private val dataSource: DataSource) {
     }
 
     private fun prepareStatement(c: Connection, stmt: SqlStatement): PreparedStatement {
-        return stmt.params.withIndex().fold(c.prepareStatement(stmt.sql), { ps, param -> ps.setObject(param.index + 1, param.value); ps })
+        return stmt.params.withIndex().fold(c.prepareStatement(stmt.sql, Statement.RETURN_GENERATED_KEYS), { ps, param -> ps.setObject(param.index + 1, param.value); ps })
     }
 }

@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = 'com.softwareberg.rinca'
-    version = '0.7.2'
+    version = '0.8.0'
 }
 
 defaultTasks 'build'
@@ -54,6 +54,19 @@ subprojects {
 
     check {
         dependsOn = check.dependsOn + [ktLint]
+    }
+
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+        repositories {
+            mavenLocal()
+        }
     }
 
     repositories {
