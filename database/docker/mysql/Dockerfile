@@ -1,2 +1,2 @@
-FROM library/postgres:10.4-alpine
+FROM library/mysql:8.0
 ADD init.sql /docker-entrypoint-initdb.d/

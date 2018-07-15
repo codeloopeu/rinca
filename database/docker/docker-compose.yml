@@ -2,6 +2,11 @@ version: '3'
 services:
   postgresql:
     build: postgresql
-    env_file: .env
+    env_file: ./postgresql/.env
     ports:
     - '5432:5432'
+  mysql:
+    build: mysql
+    env_file: ./mysql/.env
+    ports:
+    - '3306:3306'

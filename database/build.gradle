@@ -7,4 +7,5 @@ dependencies {
 
     testCompile 'com.h2database:h2:1.4.197'
     testCompile 'org.postgresql:postgresql:42.2.2'
+    testCompile 'mysql:mysql-connector-java:8.0.11'
 }

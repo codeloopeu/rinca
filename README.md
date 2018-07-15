@@ -139,12 +139,12 @@ assertThat(fooB.bars).containsExactly(2, 4, 5).inOrder()
 ### Build
 
 ```bash
-gradle
+./gradlew
 ```
 
 ### Code coverage
 
 ```bash
-gradle jacocoTestReport
-open build/reports/jacoco/test/html/index.html
+./gradlew jacocoTestReport
+open **/reports/jacoco/test/html/index.html 
 ```
