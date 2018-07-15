@@ -59,12 +59,6 @@ Under the hood it uses `TransactionTemplate` ([more info](https://docs.spring.io
 ## Docker
 
 ```bash
-docker run --name softwareberg-postgres-db -p 5432:5432 -e POSTGRES_USER=softwareberg -e POSTGRES_PASSWORD=softwareberg -d postgres:10.1-alpine
-```
-
-or
-
-```bash
 cd ./database/docker
 docker-compose up
 ```

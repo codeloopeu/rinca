@@ -1,5 +1,5 @@
 dependencies {
-    compile 'org.asynchttpclient:async-http-client:2.4.9'
+    compile 'org.asynchttpclient:async-http-client:2.5.2'
 
-    testCompile 'org.mock-server:mockserver-netty:5.3.0'
+    testCompile 'org.mock-server:mockserver-netty:5.4.1'
 }

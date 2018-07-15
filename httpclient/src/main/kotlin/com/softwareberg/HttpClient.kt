@@ -8,7 +8,7 @@ import org.asynchttpclient.RequestBuilder
 import org.asynchttpclient.Response
 import java.util.concurrent.CompletableFuture
 
-interface HttpClient {
+interface HttpClient : AutoCloseable {
     fun execute(request: HttpRequest): CompletableFuture<HttpResponse>
 }
 
@@ -46,5 +46,9 @@ class SimpleHttpClient(private val asyncHttpClient: AsyncHttpClient) : HttpClien
         val statusCode = response.statusCode
         val headers = response.headers.map { header -> HttpHeader(header.key, header.value) }
         return HttpResponse(statusCode, headers, body)
+    }
+
+    override fun close() {
+        asyncHttpClient.close()
     }
 }

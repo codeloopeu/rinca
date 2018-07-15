@@ -1,11 +1,11 @@
 dependencies {
     compile 'org.springframework:spring-jdbc:5.0.7.RELEASE'
 
-    testCompile 'org.flywaydb:flyway-core:5.1.1'
+    testCompile 'org.flywaydb:flyway-core:5.1.4'
     testCompile 'com.zaxxer:HikariCP:3.2.0'
     testCompile 'com.ninja-squad:DbSetup:2.1.0'
 
     testCompile 'com.h2database:h2:1.4.197'
-    testCompile 'org.postgresql:postgresql:42.2.2'
+    testCompile 'org.postgresql:postgresql:42.2.4'
     testCompile 'mysql:mysql-connector-java:8.0.11'
 }
