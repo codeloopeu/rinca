@@ -15,25 +15,25 @@ typealias Extractor<T> = (Row) -> T
 
 fun <T> createExtractor(extractor: Extractor<T>): Extractor<T> = extractor
 
-class SqlStatement(val sql: String, val params: Array<out Any>) {
+class SqlStatement(val sql: String, val params: Array<out Any?>) {
     companion object {
         @JvmStatic
-        fun create(sql: String, vararg params: Any): SqlStatement = SqlStatement(sql, params)
+        fun create(sql: String, vararg params: Any?): SqlStatement = SqlStatement(sql, params)
     }
 }
 
 fun String.paramsList(vararg params: Any): SqlStatement = SqlStatement(this, params)
 
-class NamedSqlStatement(val sql: String, val params: Map<String, Any>) {
+class NamedSqlStatement(val sql: String, val params: Map<String, Any?>) {
     companion object {
         @JvmStatic
         fun create(sql: String, vararg params: Param): NamedSqlStatement = NamedSqlStatement(sql, params.map { it.name to it.value }.toMap())
     }
 
-    data class Param(val name: String, val value: Any) {
+    data class Param(val name: String, val value: Any?) {
         companion object {
             @JvmStatic
-            fun of(name: String, value: Any): Param = Param(name, value)
+            fun of(name: String, value: Any?): Param = Param(name, value)
         }
     }
 }
