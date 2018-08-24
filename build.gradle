@@ -1,7 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.51'
     id 'com.github.ben-manes.versions' version '0.20.0'
-    id 'org.jmailen.kotlinter' version '1.14.0'
+    id 'org.jmailen.kotlinter' version '1.16.0'
 }
 
 allprojects {
@@ -75,15 +75,15 @@ subprojects {
     }
 
     dependencies {
-        compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.51'
-        compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.51'
+        compile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+        compile 'org.jetbrains.kotlin:kotlin-reflect'
 
         testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
         testCompile 'com.nhaarman:mockito-kotlin:1.6.0'
-        testCompile 'org.assertj:assertj-core:3.10.0'
+        testCompile 'org.assertj:assertj-core:3.11.0'
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.8.1'
+    gradleVersion = '4.9'
 }
