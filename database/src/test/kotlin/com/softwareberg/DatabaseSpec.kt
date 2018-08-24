@@ -17,7 +17,7 @@ import javax.sql.DataSource
 
 class DatabaseSpec {
 
-    private data class Person(val id: Int, val name: String)
+    private data class Person(val id: Int, val name: String?)
 
     companion object {
 
@@ -65,27 +65,42 @@ class DatabaseSpec {
     }
 
     private val deleteAll = deleteAllFrom("people")
-    private val insertTwoPeople = insertInto("people").columns("id", "name").values(1, "Michal").values(2, "Kasia").build()
-    private val nameExtractor: Extractor<String> = { rs -> rs.string("name") }
+    private val nameExtractor: Extractor<String?> = { rs -> rs.stringOrNull("name") }
     private val idExtractor: Extractor<Int> = { rs -> rs.int("id") }
+    private val personExtractor: Extractor<Person> = { rs -> Person(rs.int("id"), rs.stringOrNull("name")) }
 
     @Test
     fun `it should find people by id`() {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople
+            insertPeople(1 to "Michal", 2 to "Kasia", 3 to "Zuzia")
         )
 
         // when
         val nameA = database.findOne("SELECT name FROM people WHERE id = 1", nameExtractor)
-        val nameB = database.findOne("SELECT name FROM people WHERE id = ?".paramsList(1), nameExtractor)
-        val nameC = database.findOne("SELECT name FROM people WHERE id = :id".params("id" to 2), nameExtractor)
+        val nameB = database.findOne("SELECT name FROM people WHERE id = ?".paramsList(2), nameExtractor)
+        val nameC = database.findOne("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
 
         // then
         assertThat(nameA).isEqualTo("Michal")
-        assertThat(nameB).isEqualTo("Michal")
-        assertThat(nameC).isEqualTo("Kasia")
+        assertThat(nameB).isEqualTo("Kasia")
+        assertThat(nameC).isEqualTo("Zuzia")
+    }
+
+    @Test
+    fun `it should map row to data class with custom extractor`() {
+        // given
+        prepareDatabase(
+            deleteAll,
+            insertPeople(2 to "Kasia")
+        )
+
+        // when
+        val person = database.findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2)) { rs -> Person(rs.int("id"), rs.string("name")) }
+
+        // then
+        assertThat(person).isEqualTo(Person(2, "Kasia"))
     }
 
     @Test
@@ -93,23 +108,7 @@ class DatabaseSpec {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople
-        )
-
-        // when
-        val person = database.findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2), { rs -> Person(rs.int("id"), rs.string("name")) })
-
-        // then
-        assertThat(person).isEqualTo(Person(2, "Kasia"))
-    }
-
-    @Test
-    fun `it should map row to data class with external extractor`() {
-        // given
-        val personExtractor = createExtractor { rs -> Person(id = rs.int("id"), name = rs.string("name")) }
-        prepareDatabase(
-            deleteAll,
-            insertTwoPeople
+            insertPeople(2 to "Kasia")
         )
 
         // when
@@ -120,16 +119,17 @@ class DatabaseSpec {
     }
 
     @Test
-    fun `it should return null if person does not exsist`() {
+    fun `it should return null if person does not exist`() {
         // given
         prepareDatabase(
-            deleteAll,
-            insertTwoPeople
+            deleteAll
         )
+
         // when
         val nonExistingNameA = database.findOne("SELECT name FROM people WHERE id = 3", nameExtractor)
         val nonExistingNameB = database.findOne("SELECT name FROM people WHERE id = ?".paramsList(3), nameExtractor)
         val nonExistingNameC = database.findOne("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
+
         // then
         assertThat(nonExistingNameA).isNull()
         assertThat(nonExistingNameB).isNull()
@@ -141,7 +141,7 @@ class DatabaseSpec {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople
+            insertPeople(1 to "Michal", 2 to "Kasia")
         )
 
         // when
@@ -156,8 +156,7 @@ class DatabaseSpec {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople,
-            insertPeopleHelper(listOf(3 to "Ania", 4 to "Michal", 7 to "Michal"))
+            insertPeople(3 to "Ania", 4 to "Michal", 7 to "Michal")
         )
 
         // when
@@ -166,18 +165,17 @@ class DatabaseSpec {
         val idsC = database.findAll("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), idExtractor)
 
         // then
-        assertThat(idsA).containsExactly(1, 4, 7)
-        assertThat(idsB).containsExactly(1, 4, 7)
-        assertThat(idsC).containsExactly(1, 4, 7)
+        assertThat(idsA).containsExactly(4, 7)
+        assertThat(idsB).containsExactly(4, 7)
+        assertThat(idsC).containsExactly(4, 7)
     }
 
     @Test
-    fun `it should return list of ids of people with name "Ola"`() {
+    fun `it should return list of ids of people with name "Ola" (no result)`() {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople,
-            insertPeopleHelper(listOf(3 to "Ania", 4 to "Michal", 7 to "Michal"))
+            insertPeople(1 to "Michal", 2 to "Kasia")
         )
 
         // when
@@ -191,18 +189,34 @@ class DatabaseSpec {
     fun `it should insert person`() {
         // given
         prepareDatabase(
-            deleteAll,
-            insertTwoPeople
+            deleteAll
         )
 
         // when
         database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 3, "name" to "Michal"))
-        database.insert("INSERT INTO people (id, name) VALUES (?, ?)".paramsList(7, "Michal"))
-        database.insert("INSERT INTO people (id, name) VALUES (8, 'Michal')")
-        val ids = database.findAll("SELECT id FROM people WHERE name = ?".paramsList("Michal"), idExtractor)
+        database.insert("INSERT INTO people (id, name) VALUES (?, ?)".paramsList(7, "Kasia"))
+        database.insert("INSERT INTO people (id, name) VALUES (8, 'Bob')")
+        val people = database.findAll("SELECT id, name FROM people", personExtractor)
 
         // then
-        assertThat(ids).containsExactly(1, 3, 7, 8)
+        assertThat(people).containsExactlyInAnyOrder(Person(3, "Michal"), Person(7, "Kasia"), Person(8, "Bob"))
+    }
+
+    @Test
+    fun `it should insert person with nullable name`() {
+        // given
+        prepareDatabase(
+            deleteAll
+        )
+
+        // when
+        database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 3, "name" to null))
+        database.insert("INSERT INTO people (id, name) VALUES (?, ?)".paramsList(7, null))
+        database.insert("INSERT INTO people (id, name) VALUES (8, NULL)")
+        val names = database.findAll("SELECT id, name FROM people", nameExtractor)
+
+        // then
+        assertThat(names).containsExactly(null, null, null)
     }
 
     @Test
@@ -225,8 +239,7 @@ class DatabaseSpec {
         // given
         prepareDatabase(
             deleteAll,
-            insertTwoPeople,
-            insertPeopleHelper(listOf(3 to "Ania", 4 to "Michal", 7 to "Michal"))
+            insertPeople(1 to "Ania", 2 to "Michal", 3 to "Michal", 4 to "Karol")
         )
 
         // when
@@ -236,7 +249,7 @@ class DatabaseSpec {
         val people = findNamesOrderedById()
 
         // then
-        assertThat(people).containsExactly("Szymon", "Piotr", "Zofia", "Michal", "Michal")
+        assertThat(people).containsExactly("Szymon", "Piotr", "Zofia", "Karol")
     }
 
     @Test
@@ -275,14 +288,14 @@ class DatabaseSpec {
         assertThat(people).isEmpty()
     }
 
-    private fun findNamesOrderedById(): List<String> = database.findAll("SELECT name FROM people ORDER BY id", nameExtractor)
+    private fun findNamesOrderedById(): List<String> = database.findAll("SELECT name FROM people ORDER BY id", nameExtractor).filterNotNull()
 
     private fun prepareDatabase(vararg operations: Operation) {
         val sequenceOfOperations = Operations.sequenceOf(operations.toList())
         DbSetup(DataSourceDestination(dataSource), sequenceOfOperations).launch()
     }
 
-    private fun insertPeopleHelper(people: List<Pair<Int, String>>): Operation {
-        return people.fold(insertInto("people").columns("id", "name"), { acc, e -> acc.values(e.first, e.second) }).build()
+    private fun insertPeople(vararg people: Pair<Int, String>): Operation {
+        return people.fold(insertInto("people").columns("id", "name")) { acc, e -> acc.values(e.first, e.second) }.build()
     }
 }

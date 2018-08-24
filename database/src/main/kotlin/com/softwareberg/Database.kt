@@ -22,7 +22,7 @@ class SqlStatement(val sql: String, val params: Array<out Any?>) {
     }
 }
 
-fun String.paramsList(vararg params: Any): SqlStatement = SqlStatement(this, params)
+fun String.paramsList(vararg params: Any?): SqlStatement = SqlStatement(this, params)
 
 class NamedSqlStatement(val sql: String, val params: Map<String, Any?>) {
     companion object {
@@ -38,7 +38,7 @@ class NamedSqlStatement(val sql: String, val params: Map<String, Any?>) {
     }
 }
 
-fun String.params(vararg params: Pair<String, Any>): NamedSqlStatement = NamedSqlStatement(this, params.toMap())
+fun String.params(vararg params: Pair<String, Any?>): NamedSqlStatement = NamedSqlStatement(this, params.toMap())
 
 class Database(private val dataSource: DataSource) {
 
