@@ -9,6 +9,7 @@ import com.ninja_squad.dbsetup.operation.Operation
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.flywaydb.core.Flyway
 import org.h2.tools.Server
 import org.junit.jupiter.api.AfterAll
@@ -278,14 +279,61 @@ class DatabaseSpec {
         )
 
         // when
-        database.transaction {
-            database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
-            database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Michal"))
+        val exception = catchThrowable {
+            database.transaction {
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Michal"))
+            }
+        }
+        val people = findNamesOrderedById()
+
+        // then
+        assertThat(exception).hasMessageContaining("SQL")
+        assertThat(people).isEmpty()
+    }
+
+    @Test
+    fun `it should exec transaction (manual error handling - rollback)`() {
+        // given
+        prepareDatabase(
+            deleteAll
+        )
+
+        // when
+        database.transactionManual { status ->
+            try {
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Michal"))
+            } catch (e: Exception) {
+                status.setRollbackOnly()
+            }
         }
         val people = findNamesOrderedById()
 
         // then
         assertThat(people).isEmpty()
+    }
+
+    @Test
+    fun `it should exec transaction (manual error handling - commit)`() {
+        // given
+        prepareDatabase(
+            deleteAll
+        )
+
+        // when
+        database.transactionManual {
+            try {
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Kasia"))
+                database.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 1, "name" to "Michal"))
+            } catch (e: Exception) {
+                // noop
+            }
+        }
+        val people = findNamesOrderedById()
+
+        // then
+        assertThat(people).containsExactly("Kasia")
     }
 
     private fun findNamesOrderedById(): List<String> = database.findAll("SELECT name FROM people ORDER BY id", nameExtractor).filterNotNull()

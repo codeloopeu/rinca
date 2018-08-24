@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.jdbc.support.GeneratedKeyHolder
+import org.springframework.transaction.TransactionDefinition.ISOLATION_DEFAULT
+import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.TransactionTemplate
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -103,16 +105,25 @@ class Database(private val dataSource: DataSource) {
         return insert(sql.paramsList())
     }
 
-    fun transaction(operations: () -> Unit) {
+    fun transaction(isolationLevel: Int = ISOLATION_DEFAULT, operations: () -> Unit) {
         val transactionManager = DataSourceTransactionManager(dataSource)
         val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.isolationLevel = isolationLevel
         transactionTemplate.execute { status ->
             try {
                 operations()
             } catch (e: Exception) {
                 status.setRollbackOnly()
+                throw e
             }
         }
+    }
+
+    fun transactionManual(isolationLevel: Int = ISOLATION_DEFAULT, operations: (status: TransactionStatus) -> Unit) {
+        val transactionManager = DataSourceTransactionManager(dataSource)
+        val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.isolationLevel = isolationLevel
+        transactionTemplate.execute { operations(it) }
     }
 
     private fun prepareStatementNoGeneratedKeys(c: Connection, stmt: SqlStatement): PreparedStatement {
