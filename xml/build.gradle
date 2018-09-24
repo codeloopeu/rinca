@@ -1,5 +1,5 @@
 dependencies {
-    ext.jacksonVersion = '2.9.6'
+    ext.jacksonVersion = '2.9.7'
 
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
