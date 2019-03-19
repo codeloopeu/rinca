@@ -66,9 +66,9 @@ class DatabaseSpec {
     }
 
     private val deleteAll = deleteAllFrom("people")
-    private val nameExtractor: Extractor<String?> = { rs -> rs.stringOrNull("name") }
-    private val idExtractor: Extractor<Int> = { rs -> rs.int("id") }
-    private val personExtractor: Extractor<Person> = { rs -> Person(rs.int("id"), rs.stringOrNull("name")) }
+    private val nameExtractor = createExtractor { rs -> rs.stringOrNull("name") }
+    private val idExtractor = createExtractor { rs -> rs.int("id") }
+    private val personExtractor = createExtractor { rs -> Person(rs.int("id"), rs.stringOrNull("name")) }
 
     @Test
     fun `it should find people by id`() {
