@@ -47,13 +47,26 @@ class NamedSqlStatement(val sql: String, val params: Map<String, Any?>) {
 
     data class Params(val params: List<Param>) {
         companion object {
+
             @JvmStatic
             fun of(k1: String, v1: Any?): Params = Params(listOf(Param(k1, v1)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?, k3: String, v3: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2), Param(k3, v3)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?, k3: String, v3: Any?, k4: String, v4: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2), Param(k3, v3), Param(k4, v4)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?, k3: String, v3: Any?, k4: String, v4: Any?, k5: String, v5: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2), Param(k3, v3), Param(k4, v4), Param(k5, v5)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?, k3: String, v3: Any?, k4: String, v4: Any?, k5: String, v5: Any?, k6: String, v6: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2), Param(k3, v3), Param(k4, v4), Param(k5, v5), Param(k6, v6)))
+
+            @JvmStatic
             fun of(k1: String, v1: Any?, k2: String, v2: Any?, k3: String, v3: Any?, k4: String, v4: Any?, k5: String, v5: Any?, k6: String, v6: Any?, k7: String, v7: Any?): Params = Params(listOf(Param(k1, v1), Param(k2, v2), Param(k3, v3), Param(k4, v4), Param(k5, v5), Param(k6, v6), Param(k7, v7)))
         }
     }
