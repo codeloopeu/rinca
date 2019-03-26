@@ -13,7 +13,7 @@ import java.sql.Timestamp
 /*
 https://github.com/andrewoma/kwery/blob/master/core/src/main/kotlin/com/github/andrewoma/kwery/core/Row.kt
  */
-class Row(private val resultSet: ResultSet) {
+open class Row(private val resultSet: ResultSet) {
     fun obj(name: String): Any = requireNotNull(resultSet.getObject(name), name)
     fun objectOrNull(name: String): Any? = resultSet.getObject(name)
 

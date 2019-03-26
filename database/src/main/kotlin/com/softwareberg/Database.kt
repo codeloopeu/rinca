@@ -14,15 +14,18 @@ import java.sql.PreparedStatement
 import javax.sql.DataSource
 
 typealias ExtractorFn<T> = (Row) -> T
-typealias RowProcessorFn = (Row) -> Unit
+typealias RowSetExtractorFn<T> = (RowSet) -> T
 
 fun <T> createExtractor(extractor: ExtractorFn<T>): Extractor<T> = Extractor { extractor(it) }
-fun createRowProcessor(processor: RowProcessorFn): RowProcessor = RowProcessor { processor(it) }
+fun <T> createRowSetExtractor(extractor: RowSetExtractorFn<T>): RowSetExtractor<T> = RowSetExtractor { extractor(it) }
 
 class SqlStatement(val sql: String, val params: Array<out Any?>) {
     companion object {
         @JvmStatic
         fun create(sql: String, vararg params: Any?): SqlStatement = SqlStatement(sql, params)
+
+        @JvmStatic
+        fun create(sql: String, params: List<Any?>): SqlStatement = SqlStatement(sql, params.toTypedArray())
     }
 }
 
@@ -78,25 +81,17 @@ fun String.params(vararg params: Pair<String, Any?>): NamedSqlStatement = NamedS
 
 class Database(private val dataSource: DataSource) {
 
-    fun query(stmt: SqlStatement, processor: RowProcessor) {
-        JdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<Unit> { rs ->
-            if (rs.next()) {
-                processor.process(Row(rs))
-            }
-        })
+    fun <T> query(stmt: SqlStatement, extractor: RowSetExtractor<T>): T? {
+        return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs -> extractor.extract(RowSet(rs)) })
     }
 
-    fun query(stmt: NamedSqlStatement, processor: RowProcessor) {
-        NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<Unit> { rs ->
-            if (rs.next()) {
-                processor.process(Row(rs))
-            }
-        })
+    fun <T> query(stmt: NamedSqlStatement, extractor: RowSetExtractor<T>): T? {
+        return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs -> extractor.extract(RowSet(rs)) })
     }
 
-    fun query(sql: String, processor: RowProcessor) = query(SqlStatement.create(sql), processor)
+    fun <T> query(sql: String, extractor: RowSetExtractor<T>): T? = query(SqlStatement.create(sql), extractor)
 
-    fun <T> findOne(stmt: SqlStatement, extractor: Extractor<T>): T? {
+    fun <T> extractFirstRow(stmt: SqlStatement, extractor: Extractor<T>): T? {
         return JdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs ->
             if (rs.next()) {
                 extractor.extract(Row(rs))
@@ -106,7 +101,7 @@ class Database(private val dataSource: DataSource) {
         })
     }
 
-    fun <T> findOne(stmt: NamedSqlStatement, extractor: Extractor<T>): T? {
+    fun <T> extractFirstRow(stmt: NamedSqlStatement, extractor: Extractor<T>): T? {
         return NamedParameterJdbcTemplate(dataSource).query(stmt.sql, stmt.params, ResultSetExtractor<T> { rs ->
             if (rs.next()) {
                 extractor.extract(Row(rs))
@@ -116,7 +111,7 @@ class Database(private val dataSource: DataSource) {
         })
     }
 
-    fun <T> findOne(sql: String, extractor: Extractor<T>): T? = findOne(SqlStatement.create(sql), extractor)
+    fun <T> extractFirstRow(sql: String, extractor: Extractor<T>): T? = extractFirstRow(SqlStatement.create(sql), extractor)
 
     fun <T> findAll(stmt: SqlStatement, extractor: Extractor<T>): List<T> {
         return JdbcTemplate(dataSource).query(stmt.sql, stmt.params) { rs, _ -> extractor.extract(Row(rs)) }
@@ -193,12 +188,12 @@ class Database(private val dataSource: DataSource) {
     }
 }
 
-fun Database.query(stmt: SqlStatement, processor: RowProcessorFn) = this.query(stmt, createRowProcessor(processor))
-fun Database.query(stmt: NamedSqlStatement, processor: RowProcessorFn) = this.query(stmt, createRowProcessor(processor))
-fun Database.query(sql: String, processor: RowProcessorFn) = this.query(sql, createRowProcessor(processor))
-fun <T> Database.findOne(stmt: SqlStatement, extractor: ExtractorFn<T>): T? = this.findOne(stmt, createExtractor(extractor))
-fun <T> Database.findOne(stmt: NamedSqlStatement, extractor: ExtractorFn<T>): T? = this.findOne(stmt, createExtractor(extractor))
-fun <T> Database.findOne(sql: String, extractor: ExtractorFn<T>): T? = this.findOne(sql, createExtractor(extractor))
+fun <T> Database.query(stmt: SqlStatement, extractor: RowSetExtractorFn<T>): T? = this.query(stmt, createRowSetExtractor(extractor))
+fun <T> Database.query(stmt: NamedSqlStatement, extractor: RowSetExtractorFn<T>): T? = this.query(stmt, createRowSetExtractor(extractor))
+fun <T> Database.query(sql: String, extractor: RowSetExtractorFn<T>): T? = this.query(sql, createRowSetExtractor(extractor))
+fun <T> Database.extractFirstRow(stmt: SqlStatement, extractor: ExtractorFn<T>): T? = this.extractFirstRow(stmt, createExtractor(extractor))
+fun <T> Database.extractFirstRow(stmt: NamedSqlStatement, extractor: ExtractorFn<T>): T? = this.extractFirstRow(stmt, createExtractor(extractor))
+fun <T> Database.extractFirstRow(sql: String, extractor: ExtractorFn<T>): T? = this.extractFirstRow(sql, createExtractor(extractor))
 fun <T> Database.findAll(stmt: SqlStatement, extractor: ExtractorFn<T>): List<T> = this.findAll(stmt, createExtractor(extractor))
 fun <T> Database.findAll(stmt: NamedSqlStatement, extractor: ExtractorFn<T>): List<T> = this.findAll(stmt, createExtractor(extractor))
 fun <T> Database.findAll(sql: String, extractor: ExtractorFn<T>): List<T> = this.findAll(sql, createExtractor(extractor))

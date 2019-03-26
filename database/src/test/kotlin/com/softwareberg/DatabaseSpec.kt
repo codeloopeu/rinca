@@ -79,9 +79,9 @@ class DatabaseSpec {
         )
 
         // when
-        val nameA = database.findOne("SELECT name FROM people WHERE id = 1", nameExtractor)
-        val nameB = database.findOne("SELECT name FROM people WHERE id = ?".paramsList(2), nameExtractor)
-        val nameC = database.findOne("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
+        val nameA = database.extractFirstRow("SELECT name FROM people WHERE id = 1", nameExtractor)
+        val nameB = database.extractFirstRow("SELECT name FROM people WHERE id = ?".paramsList(2), nameExtractor)
+        val nameC = database.extractFirstRow("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
 
         // then
         assertThat(nameA).isEqualTo("Michal")
@@ -98,7 +98,7 @@ class DatabaseSpec {
         )
 
         // when
-        val person = database.findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2)) { rs -> Person(rs.int("id"), rs.string("name")) }
+        val person = database.extractFirstRow("SELECT id, name FROM people WHERE id = :id".params("id" to 2)) { rs -> Person(rs.int("id"), rs.string("name")) }
 
         // then
         assertThat(person).isEqualTo(Person(2, "Kasia"))
@@ -113,7 +113,7 @@ class DatabaseSpec {
         )
 
         // when
-        val person = database.findOne("SELECT id, name FROM people WHERE id = :id".params("id" to 2), personExtractor)
+        val person = database.extractFirstRow("SELECT id, name FROM people WHERE id = :id".params("id" to 2), personExtractor)
 
         // then
         assertThat(person).isEqualTo(Person(2, "Kasia"))
@@ -127,9 +127,9 @@ class DatabaseSpec {
         )
 
         // when
-        val nonExistingNameA = database.findOne("SELECT name FROM people WHERE id = 3", nameExtractor)
-        val nonExistingNameB = database.findOne("SELECT name FROM people WHERE id = ?".paramsList(3), nameExtractor)
-        val nonExistingNameC = database.findOne("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
+        val nonExistingNameA = database.extractFirstRow("SELECT name FROM people WHERE id = 3", nameExtractor)
+        val nonExistingNameB = database.extractFirstRow("SELECT name FROM people WHERE id = ?".paramsList(3), nameExtractor)
+        val nonExistingNameC = database.extractFirstRow("SELECT name FROM people WHERE id = :id".params("id" to 3), nameExtractor)
 
         // then
         assertThat(nonExistingNameA).isNull()

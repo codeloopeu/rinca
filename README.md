@@ -13,7 +13,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:database:0.11.3'
+    compile 'com.github.softwareberg.rinca:database:0.12.0'
 }
 ```
 
@@ -21,7 +21,7 @@ dependencies {
 
 ```kotlin
 val db = Database(dataSource)
-val personName = db.findOne("SELECT id, name FROM people WHERE id = 1", { rs -> rs.string("name") })
+val personName = db.query("SELECT id, name FROM people WHERE id = 1", { rs -> rs.string("name") })
 println("person name: personName")
 ```
 
@@ -34,7 +34,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:httpclient:0.11.3'
+    compile 'com.github.softwareberg.rinca:httpclient:0.12.0'
 }
 ```
 
@@ -57,7 +57,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:json:0.11.3'
+    compile 'com.github.softwareberg.rinca:json:0.12.0'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:xml:0.11.3'
+    compile 'com.github.softwareberg.rinca:xml:0.12.0'
 }
 ```
 

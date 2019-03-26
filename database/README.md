@@ -7,7 +7,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:database:0.11.3'
+    compile 'com.github.softwareberg.rinca:database:0.12.0'
 }
 ```
 
@@ -18,7 +18,7 @@ dependencies {
 ```kotlin
 val db = Database(dataSource)
 
-val id = db.findOne("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), { rs -> rs.int("id") })
+val id = db.query("SELECT id FROM people WHERE name = :name".params("name" to "Michal"), { rs -> rs.int("id") })
 val names = db.findAll("SELECT name FROM people", { rs -> rs.string("name") })
 val insertedId = db.insert("INSERT INTO people (id, name) VALUES (:id, :name)".params("id" to 3, "name" to "Michal"))["id"]
 val rowsAffectedCount = db.update("UPDATE people SET name = 'Piotr' WHERE id = ?".paramsList(2))
@@ -36,7 +36,7 @@ data class Person(val id: Int, val name: String)
 val personExtractor = createExtractor { rs -> Person(id = rs.int("id"), name = rs.string("name")) }
 
 val db = Database(dataSource)
-val person = db.findOne("SELECT id, name FROM people WHERE id = 1", personExtractor)
+val person = db.query("SELECT id, name FROM people WHERE id = 1", personExtractor)
 println("person: $person") // Person(id=1, name=Michal)
 ```
 

@@ -7,7 +7,7 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-    compile 'com.github.softwareberg.rinca:json:0.11.3'
+    compile 'com.github.softwareberg.rinca:json:0.12.0'
 }
 ```
 
