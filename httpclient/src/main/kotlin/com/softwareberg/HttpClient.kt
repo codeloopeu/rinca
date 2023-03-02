@@ -2,7 +2,8 @@ package com.softwareberg
 
 import io.netty.handler.codec.http.DefaultHttpHeaders
 import org.asynchttpclient.AsyncHttpClient
-import org.asynchttpclient.DefaultAsyncHttpClient
+import org.asynchttpclient.Dsl.asyncHttpClient
+import org.asynchttpclient.Dsl.config
 import org.asynchttpclient.Request
 import org.asynchttpclient.RequestBuilder
 import org.asynchttpclient.Response
@@ -15,7 +16,7 @@ interface HttpClient : AutoCloseable {
 class SimpleHttpClient(private val asyncHttpClient: AsyncHttpClient) : HttpClient {
 
     companion object {
-        fun create(): HttpClient = SimpleHttpClient(DefaultAsyncHttpClient())
+        fun create(): HttpClient = SimpleHttpClient(asyncHttpClient(config().setCookieStore(null).build()))
     }
 
     override fun execute(request: HttpRequest): CompletableFuture<HttpResponse> {
